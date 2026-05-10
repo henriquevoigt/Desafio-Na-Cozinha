@@ -19,7 +19,7 @@ def garantir_db():
     
 def carregar_receitas() -> list[Receita]:
 
-    garantir_dataset()
+    garantir_db()
     lista = [] 
 
     with open("data/receitas.json", "r", encoding="utf-8") as arquivo:
