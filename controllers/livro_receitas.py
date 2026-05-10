@@ -12,9 +12,14 @@ def garantir_db():
     if not os.path.exists("data"):
         os.makedirs("data")
 
-    if not os.path.exists("caminho_local"):
+    if not os.path.exists(caminho_local):
         print("Baixando base de dados...")
-        urllib.request.urlretrieve(url, caminho_local)
+        requisicao = urllib.request.Request(
+            url, 
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+        )
+        with urllib.request.urlopen(requisicao) as resposta, open(caminho_local, 'wb') as arquivo:
+            arquivo.write(resposta.read())
         print("Download concluido!")
     
 def carregar_receitas() -> list[Receita]:
