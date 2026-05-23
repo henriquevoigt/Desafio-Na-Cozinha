@@ -1,5 +1,6 @@
 import subprocess
 import os
+from controllers.investigacao import *
 
 def limpar_tela():
     comando = "cls" if os.name == "nt" else "clear"
@@ -84,7 +85,7 @@ def sub_menu_busca(trie_nomes, trie_ids, trie_categorias):
             print("\n Opção inválida!")
             input("Pressione ENTER para voltar...")
 
-def sub_menu_investigacao():
+def sub_menu_investigacao(estante_de_receitas, hash_table):
     while True:
         limpar_tela()
         print("=" * 40)
@@ -100,6 +101,12 @@ def sub_menu_investigacao():
         opcao = input("\nEscolha uma opção: ")
         if opcao == '0':
             break
+        elif opcao == '1':
+            investigar_por_id(estante_de_receitas, hash_table)
+        elif opcao == '2':
+            investigar_por_nome(estante_de_receitas, hash_table)
+        elif opcao == '3':
+            investigar_por_ingrediente(estante_de_receitas, hash_table)
         else:
             print("\n Tabela Hash manual em construção!")
             input("Pressione ENTER para voltar...")
@@ -124,7 +131,7 @@ def sub_menu_chef():
             print("\n Algoritmo Guloso em construção!")
             input("Pressione ENTER para voltar...")
 
-def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas):
+def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_table):
     while True:
         limpar_tela()
         print("=" * 55)
@@ -151,7 +158,7 @@ def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas):
             sub_menu_busca(trie_nomes, trie_ids, trie_categorias)
             
         elif opcao == '3':
-            sub_menu_investigacao()
+            sub_menu_investigacao(estante_de_receitas, hash_table)
             
         elif opcao == '4':
             sub_menu_chef()

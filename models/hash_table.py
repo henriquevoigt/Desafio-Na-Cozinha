@@ -12,7 +12,7 @@ class HashTable:
         data += str(recipe.cookTimeMinutes)
         hash_value = 0
         for char in data:
-            hash_value += ord(char)
+            hash_value = hash_value * 31 + ord(char)
         return hash_value
 
     def get_index(self, recipe):
