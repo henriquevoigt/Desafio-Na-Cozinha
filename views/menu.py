@@ -12,7 +12,7 @@ def exibir_receita_resumida(receita):
     print(f"    Ingredientes: {receita.ingredients[:3]}...")
     print("-" * 40)
 
-def sub_menu_busca(trie_nomes, trie_ids, trie_categorias):
+def sub_menu_busca(trie_nomes, trie_ids, trie_categorias, indice_ingredientes):
     while True:
         limpar_tela()
         print("=" * 40)
@@ -20,7 +20,7 @@ def sub_menu_busca(trie_nomes, trie_ids, trie_categorias):
         print("=" * 40)
         print(" [1] Buscar por ID (Trie)")
         print(" [2] Buscar por Nome (Trie)")
-        print(" [3] Buscar por Ingrediente (Hash - EM BREVE)")
+        print(" [3] Buscar por Ingrediente (Hash)")
         print(" [4] Buscar por Categoria (Trie)")
         print(" [0] Voltar ao Menu Principal")
         print("=" * 40)
@@ -76,8 +76,19 @@ def sub_menu_busca(trie_nomes, trie_ids, trie_categorias):
             input("\nPressione ENTER para voltar...")
 
         elif opcao == '3':
-            print("\n O Módulo de Ingredientes requer a Tabela Hash manual.")
-            input("Pressione ENTER para voltar...")
+            limpar_tela()
+            print("--- BUSCA POR INGREDIENTE ---")
+            ingrediente = input("Digite o nome do ingrediente: ").strip().lower()
+            
+            if ingrediente in indice_ingredientes:
+                resultados = indice_ingredientes[ingrediente]
+                print(f"\n {len(resultados)} resultado(s) encontrado(s)!\n")
+                for receita in resultados:
+                    exibir_receita_resumida(receita)
+            else:
+                print(f"\n Nenhuma receita encontrada com '{ingrediente}'.")
+                
+            input("\nPressione ENTER para voltar...")
             
         elif opcao == '0':
             break
@@ -89,12 +100,13 @@ def sub_menu_investigacao(estante_de_receitas, hash_table):
     while True:
         limpar_tela()
         print("=" * 40)
-        print(" MODO INVESTIGAÇÃO (SABOTAGEM)")
+        print("MODO INVESTIGAÇÃO (SABOTAGEM)")
         print("=" * 40)
         print(" Critério de validação de Hash:")
         print(" [1] Validar por ID")
         print(" [2] Validar por Nome")
         print(" [3] Validar por Ingrediente")
+        print(" [4] Sabotar uma receita (Teste de Segurança)")
         print(" [0] Voltar ao Menu Principal")
         print("=" * 40)
         
@@ -107,8 +119,10 @@ def sub_menu_investigacao(estante_de_receitas, hash_table):
             investigar_por_nome(estante_de_receitas, hash_table)
         elif opcao == '3':
             investigar_por_ingrediente(estante_de_receitas, hash_table)
+        elif opcao == '4':
+            sabotar_receita(estante_de_receitas)
         else:
-            print("\n Tabela Hash manual em construção!")
+            print("\n Opção inválida!")
             input("Pressione ENTER para voltar...")
 
 def sub_menu_chef():
@@ -131,7 +145,7 @@ def sub_menu_chef():
             print("\n Algoritmo Guloso em construção!")
             input("Pressione ENTER para voltar...")
 
-def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_table):
+def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_table, indice_ingredientes):
     while True:
         limpar_tela()
         print("=" * 55)
@@ -155,7 +169,7 @@ def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_
             input("\nPressione ENTER para voltar ao menu...")
             
         elif opcao == '2':
-            sub_menu_busca(trie_nomes, trie_ids, trie_categorias)
+            sub_menu_busca(trie_nomes, trie_ids, trie_categorias, indice_ingredientes)
             
         elif opcao == '3':
             sub_menu_investigacao(estante_de_receitas, hash_table)
