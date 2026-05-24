@@ -13,6 +13,28 @@ def exibir_receita_resumida(receita):
     print(f"    Ingredientes: {receita.ingredients[:3]}...")
     print("-" * 40)
 
+def exibir_receita_completa(receita):
+    limpar_tela()
+    print("=" * 60)
+    print(f"RECEITA: {receita.name.upper()} (ID: {receita.id})")
+    print("=" * 60)
+    print(f" Dificuldade: {receita.difficulty}")
+    print(f" Tempo de Preparo: {receita.prepTimeMinutes} min")
+    print(f" Tempo de Cozimento: {receita.cookTimeMinutes} min")
+    print("-" * 60)
+    print("INGREDIENTES:")
+    for ing in receita.ingredients:
+        print(f"   - {ing}")
+    print("-" * 60)
+    print("MODO DE PREPARO:")
+
+    if isinstance(receita.instructions, list):
+        for i, passo in enumerate(receita.instructions, 1):
+            print(f"   {i}. {passo}")
+    else:
+        print(f"   {receita.instructions}")
+    print("=" * 60)
+
 def sub_menu_busca(trie_nomes, trie_ids, trie_categorias, indice_ingredientes):
     while True:
         limpar_tela()
@@ -23,6 +45,7 @@ def sub_menu_busca(trie_nomes, trie_ids, trie_categorias, indice_ingredientes):
         print(" [2] Buscar por Nome (Trie)")
         print(" [3] Buscar por Ingrediente (Hash)")
         print(" [4] Buscar por Categoria (Trie)")
+        print(" [5] Ver receita completa por ID")
         print(" [0] Voltar ao Menu Principal")
         print("=" * 40)
         
@@ -89,6 +112,26 @@ def sub_menu_busca(trie_nomes, trie_ids, trie_categorias, indice_ingredientes):
             else:
                 print(f"\n Nenhuma receita encontrada com '{ingrediente}'.")
                 
+            input("\nPressione ENTER para voltar...")
+
+        elif opcao == '5':
+            limpar_tela()
+            print("--- VER RECEITA COMPLETA ---")
+            id_busca = input("Digite o ID exato da receita: ").strip()
+
+            resultados_brutos = trie_ids.search_prefix(id_busca)
+
+            receita_encontrada = None
+            for r in resultados_brutos:
+                if str(r.id) == id_busca:
+                    receita_encontrada = r
+                    break
+            
+            if receita_encontrada:
+                exibir_receita_completa(receita_encontrada)
+            else:
+                print(f"\n Receita com ID '{id_busca}' não encontrada.")
+            
             input("\nPressione ENTER para voltar...")
             
         elif opcao == '0':
