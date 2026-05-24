@@ -1,6 +1,7 @@
 import subprocess
 import os
 from controllers.investigacao import *
+from controllers.recomendacao import recomendar_cardapio_guloso
 
 def limpar_tela():
     comando = "cls" if os.name == "nt" else "clear"
@@ -125,24 +126,41 @@ def sub_menu_investigacao(estante_de_receitas, hash_table):
             print("\n Opção inválida!")
             input("Pressione ENTER para voltar...")
 
-def sub_menu_chef():
+def sub_menu_chef(estante_de_receitas):
     while True:
         limpar_tela()
         print("=" * 40)
-        print("  MODO CHEF (ALGORITMO GULOSO)")
+        print("MODO CHEF (ALGORITMO GULOSO)")
         print("=" * 40)
-        print(" Parâmetro de restrição:")
-        print(" [1] Tempo de Preparo")
-        print(" [2] Dificuldade")
-        print(" [3] Avaliação (Rating)")
+        print(" Otimização: Maximizar quantidade de pratos pelo tempo.")
+        print(" [1] Gerar Cardápio")
         print(" [0] Voltar ao Menu Principal")
         print("=" * 40)
         
         opcao = input("\nEscolha uma opção: ")
         if opcao == '0':
             break
+        elif opcao == '1':
+            limpar_tela()
+            print("--- GERADOR DE CARDÁPIO ---")
+            try:
+                tempo_max = int(input("Quanto tempo livre o Chef Jacquin tem? (em minutos): "))
+                
+                cardapio, tempo_gasto = recomendar_cardapio_guloso(estante_de_receitas, tempo_max)
+                
+                if not cardapio:
+                    print("\nTempo insuficiente para preparar qualquer receita do banco de dados!")
+                else:
+                    print(f"\nCardápio Otimizado! ({len(cardapio)} receitas em {tempo_gasto} minutos)\n")
+                    for receita in cardapio:
+                        tempo_total = receita.prepTimeMinutes + receita.cookTimeMinutes
+                        print(f"- [{receita.id}] {receita.name} (Tempo: {tempo_total} min)")
+            except ValueError:
+                print("\nPor favor, digite um número inteiro válido.")
+                
+            input("\nPressione ENTER para voltar...")
         else:
-            print("\n Algoritmo Guloso em construção!")
+            print("\nOpção inválida!")
             input("Pressione ENTER para voltar...")
 
 def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_table, indice_ingredientes):
@@ -175,7 +193,7 @@ def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_
             sub_menu_investigacao(estante_de_receitas, hash_table)
             
         elif opcao == '4':
-            sub_menu_chef()
+            sub_menu_chef(estante_de_receitas)
             
         elif opcao == '0':
             limpar_tela()
