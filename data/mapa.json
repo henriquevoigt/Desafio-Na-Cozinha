@@ -1,0 +1,33 @@
+{
+  "vertices": [
+    {"id": 0, "nome": "Restaurante Jacquin (Centro)"}, {"id": 1, "nome": "UFPel Campus Anglo"}, {"id": 2, "nome": "Fragata"},
+    {"id": 3, "nome": "Três Vendas"}, {"id": 4, "nome": "Laranjal"}, {"id": 5, "nome": "Porto"},
+    {"id": 6, "nome": "Areal"}, {"id": 7, "nome": "Cohab Fragata"}, {"id": 8, "nome": "Getúlio Vargas"},
+    {"id": 9, "nome": "Centro Histórico"}, {"id": 10, "nome": "Balneário Santo Antônio"}, {"id": 11, "nome": "Santa Terezinha"},
+    {"id": 12, "nome": "Baronesa"}, {"id": 13, "nome": "Núcleo Habitacional"}, {"id": 14, "nome": "Balsa"},
+    {"id": 15, "nome": "Sítio Floresta"}, {"id": 16, "nome": "Fragata Industrial"}, {"id": 17, "nome": "Vila Princesa"},
+    {"id": 18, "nome": "Pestano"}, {"id": 19, "nome": "Coronel Pedro Osório"}, {"id": 20, "nome": "Fragata Sul"},
+    {"id": 21, "nome": "Simões Lopes"}, {"id": 22, "nome": "Centro de Convenções"}, {"id": 23, "nome": "UFPel Campus Capão"},
+    {"id": 24, "nome": "Rodoviária"}, {"id": 25, "nome": "Parque Una"}, {"id": 26, "nome": "Bom Jesus"},
+    {"id": 27, "nome": "Colina do Sol"}, {"id": 28, "nome": "Guabiroba"}, {"id": 29, "nome": "Fátima"}
+  ],
+  "arestas": [
+    {"origem": 0, "destino": 1, "peso": 5}, {"origem": 0, "destino": 9, "peso": 2}, {"origem": 1, "destino": 5, "peso": 8},
+    {"origem": 9, "destino": 24, "peso": 10}, {"origem": 24, "destino": 2, "peso": 12}, {"origem": 2, "destino": 16, "peso": 5},
+    {"origem": 16, "destino": 7, "peso": 7}, {"origem": 7, "destino": 20, "peso": 6}, {"origem": 20, "destino": 18, "peso": 8},
+    {"origem": 18, "destino": 21, "peso": 9}, {"origem": 21, "destino": 26, "peso": 7}, {"origem": 26, "destino": 3, "peso": 10},
+    {"origem": 3, "destino": 17, "peso": 6}, {"origem": 17, "destino": 13, "peso": 5}, {"origem": 13, "destino": 27, "peso": 8},
+    {"origem": 27, "destino": 28, "peso": 7}, {"origem": 28, "destino": 29, "peso": 6}, {"origem": 29, "destino": 12, "peso": 11},
+    {"origem": 12, "destino": 8, "peso": 5}, {"origem": 8, "destino": 19, "peso": 4}, {"origem": 19, "destino": 6, "peso": 9},
+    {"origem": 6, "destino": 4, "peso": 15}, {"origem": 4, "destino": 10, "peso": 8}, {"origem": 10, "destino": 11, "peso": 12},
+    {"origem": 11, "destino": 14, "peso": 10}, {"origem": 14, "destino": 22, "peso": 7}, {"origem": 22, "destino": 23, "peso": 13},
+    {"origem": 23, "destino": 0, "peso": 15}, {"origem": 25, "destino": 22, "peso": 6}, {"origem": 25, "destino": 6, "peso": 5},
+    {"origem": 5, "destino": 14, "peso": 9}, {"origem": 1, "destino": 9, "peso": 6}, {"origem": 2, "destino": 21, "peso": 11},
+    {"origem": 3, "destino": 25, "peso": 8}, {"origem": 12, "destino": 25, "peso": 4}, {"origem": 15, "destino": 18, "peso": 7},
+    {"origem": 15, "destino": 2, "peso": 10}, {"origem": 16, "destino": 21, "peso": 8}, {"origem": 17, "destino": 3, "peso": 4},
+    {"origem": 26, "destino": 27, "peso": 5}, {"origem": 28, "destino": 29, "peso": 3}, {"origem": 29, "destino": 8, "peso": 12},
+    {"origem": 19, "destino": 12, "peso": 6}, {"origem": 6, "destino": 19, "peso": 7}, {"origem": 4, "destino": 11, "peso": 5},
+    {"origem": 10, "destino": 14, "peso": 8}, {"origem": 13, "destino": 28, "peso": 4}, {"origem": 0, "destino": 24, "peso": 8},
+    {"origem": 24, "destino": 21, "peso": 10}, {"origem": 23, "destino": 5, "peso": 14}
+  ]
+}
