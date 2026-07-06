@@ -32,11 +32,11 @@ def carregar_receitas() -> list[Receita]:
                 mealType=item["mealType"],
                 
                 # P2
-                dependencias=item("dependencias"),
-                custo=item("custo"),
-                valor_venda=item("valor_venda"),
-                classe=item("classe"),
-                dificuldade_logistica=item("dificuldade_logistica")
+                dependencias=item["dependencias"],
+                custo=item["custo"],
+                valor_venda=item["valor_venda"],
+                classe=item["classe"],
+                dificuldade_logistica=item["dificuldade_logistica"]
             )
             lista.append(nova_receita)
             

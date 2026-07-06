@@ -2,6 +2,7 @@ import subprocess
 import os
 from controllers.investigacao import *
 from controllers.recomendacao import recomendar_cardapio_guloso
+from controllers.oficina import analisar_producao # Importação do Módulo 5
 
 def limpar_tela():
     comando = "cls" if os.name == "nt" else "clear"
@@ -206,6 +207,29 @@ def sub_menu_chef(estante_de_receitas):
             print("\nOpção inválida!")
             input("Pressione ENTER para voltar...")
 
+def sub_menu_oficina(estante_de_receitas):
+    limpar_tela()
+    print("=" * 40)
+    print(" MODO OFICINA DE PRODUÇÃO (MÓDULO 5)")
+    print("=" * 40)
+    print(" Analisando dependências de preparo com Grafos...\n")
+    
+    deu_certo, resultado = analisar_producao(estante_de_receitas)
+    
+    if not deu_certo:
+        print(" [!] ALERTA DO SISTEMA [!]")
+        print(f" {resultado}")
+    else:
+        print(" [OK] Análise concluída. Nenhum ciclo encontrado.")
+        print(" Ordem de preparo topológica otimizada:\n")
+        # imprime as 10 primeiras
+        for i, prato in enumerate(resultado[:10]):
+            print(f"   {i+1}. {prato}")
+        if len(resultado) > 10:
+            print(f"   ... e mais {len(resultado) - 10} pratos prontos para a linha.")
+            
+    input("\nPressione ENTER para voltar ao menu...")
+
 def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_table, indice_ingredientes):
     while True:
         limpar_tela()
@@ -217,6 +241,7 @@ def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_
         print(" [2] Modo Consulta Rápida")
         print(" [3] Modo Investigação (Hash)")
         print(" [4] Modo Chef (Guloso)")
+        print(" [5] Modo Oficina de Produção (Grafos)")
         print(" [0] Sair do sistema")
         print("=" * 55)
         
@@ -237,6 +262,9 @@ def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_
             
         elif opcao == '4':
             sub_menu_chef(estante_de_receitas)
+            
+        elif opcao == '5':
+            sub_menu_oficina(estante_de_receitas)
             
         elif opcao == '0':
             limpar_tela()
