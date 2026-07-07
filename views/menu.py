@@ -2,7 +2,8 @@ import subprocess
 import os
 from controllers.investigacao import *
 from controllers.recomendacao import recomendar_cardapio_guloso
-from controllers.oficina import analisar_producao # Importação do Módulo 5
+from controllers.oficina import analisar_producao
+from controllers.financas import maximizar_lucro_cardapio, gerar_menu_namorados
 
 def limpar_tela():
     comando = "cls" if os.name == "nt" else "clear"
@@ -230,6 +231,65 @@ def sub_menu_oficina(estante_de_receitas):
             
     input("\nPressione ENTER para voltar ao menu...")
 
+def sub_menu_financas(estante_de_receitas):
+    while True:
+        limpar_tela()
+        print("=" * 45)
+        print(" MODO INTELIGÊNCIA FINANCEIRA")
+        print("=" * 45)
+        print(" [1] Maximizar Lucro do Cardápio (PD - Módulo 6)")
+        print(" [2] Criar Combos Dia dos Namorados (Backtracking)")
+        print(" [0] Voltar ao Menu Principal")
+        print("=" * 45)
+        
+        opcao = input("\nEscolha uma opção: ")
+        
+        if opcao == '0':
+            break
+            
+        elif opcao == '1':
+            limpar_tela()
+            print("--- MAXIMIZADOR DE LUCRO (PROGRAMAÇÃO DINÂMICA) ---")
+            try:
+                orcamento = float(input("Qual o orçamento de custo máximo para os pratos? R$ "))
+                sucesso, resultado = maximizar_lucro_cardapio(estante_de_receitas, orcamento)
+                
+                if not sucesso:
+                    print(f"\n[!] {resultado}")
+                else:
+                    lucro_max, custo_real, pratos = resultado
+                    print(f"\n[OK] Análise Combinatória Concluída (Matriz Knapsack)")
+                    print(f" Custo Total: R$ {custo_real:.2f} (Dentro do limite de R$ {orcamento:.2f})")
+                    print(f" Potencial de Venda Maximizada: R$ {lucro_max:.2f}")
+                    print("\n Pratos Selecionados:")
+                    for prato in pratos:
+                        print(f"  - {prato.name} (Custo: R$ {prato.custo:.2f} | Venda: R$ {prato.valor_venda:.2f})")
+            except ValueError:
+                print("\nPor favor, digite um valor válido.")
+            input("\nPressione ENTER para voltar...")
+            
+        elif opcao == '2':
+            limpar_tela()
+            print("--- GERADOR DE COMBOS (BACKTRACKING) ---")
+            try:
+                orcamento = float(input("Qual o limite de custo para fechar o Combo? R$ "))
+                sucesso, combos = gerar_menu_namorados(estante_de_receitas, orcamento)
+                
+                if not sucesso:
+                    print(f"\n[!] {combos}")
+                else:
+                    print(f"\n[OK] {len(combos)} combinações encontradas via Poda (Pruning)!\n")
+                    for i, combo in enumerate(combos[:5]):
+                        custo = sum(p.custo for p in combo)
+                        venda = sum(p.valor_venda for p in combo)
+                        print(f"Combo {i+1} (Custo: R$ {custo:.2f} | Venda: R$ {venda:.2f})")
+                        print(f"  Entrada:   {combo[0].name}")
+                        print(f"  Principal: {combo[1].name}")
+                        print(f"  Sobremesa: {combo[2].name}\n")
+            except ValueError:
+                print("\nPor favor, digite um valor válido.")
+            input("\nPressione ENTER para voltar...")
+
 def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_table, indice_ingredientes):
     while True:
         limpar_tela()
@@ -242,6 +302,7 @@ def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_
         print(" [3] Modo Investigação (Hash)")
         print(" [4] Modo Chef (Guloso)")
         print(" [5] Modo Oficina de Produção (Grafos)")
+        print(" [6] Modo Finanças (PD/Backtracking)")
         print(" [0] Sair do sistema")
         print("=" * 55)
         
@@ -265,6 +326,9 @@ def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_
             
         elif opcao == '5':
             sub_menu_oficina(estante_de_receitas)
+
+        elif opcao == '6':
+            sub_menu_financas(estante_de_receitas)
             
         elif opcao == '0':
             limpar_tela()
