@@ -4,6 +4,7 @@ from controllers.investigacao import *
 from controllers.recomendacao import recomendar_cardapio_guloso
 from controllers.oficina import analisar_producao
 from controllers.financas import maximizar_lucro_cardapio, gerar_menu_namorados
+from controllers.logistica import rotear_entrega, planejar_infraestrutura
 
 def limpar_tela():
     comando = "cls" if os.name == "nt" else "clear"
@@ -290,6 +291,57 @@ def sub_menu_financas(estante_de_receitas):
                 print("\nPor favor, digite um valor válido.")
             input("\nPressione ENTER para voltar...")
 
+def sub_menu_logistica():
+    while True:
+        limpar_tela()
+        print("=" * 45)
+        print(" MODO LOGÍSTICA DE ENTREGAS ")
+        print("=" * 45)
+        print(" [1] Calcular Rota de Entrega (Dijkstra)")
+        print(" [2] Planejar Malha de Filiais (Prim - MST)")
+        print(" [0] Voltar ao Menu Principal")
+        print("=" * 45)
+        
+        opcao = input("\nEscolha uma opção: ")
+        
+        if opcao == '0':
+            break
+            
+        elif opcao == '1':
+            limpar_tela()
+            print("--- GPS JACQUIN (DIJKSTRA) ---")
+            print("ID 1 = UFPel Anglo | ID 4 = Laranjal | ID 14 = Balsa | ID 24 = Rodoviária")
+            try:
+                destino = int(input("\nDigite o ID do bairro de destino: "))
+                sucesso, resultado = rotear_entrega(destino)
+                
+                if not sucesso:
+                    print(f"\n[!] {resultado}")
+                else:
+                    tempo, rota = resultado
+                    print(f"\n[OK] Rota calculada com sucesso!")
+                    print(f" Tempo estimado: {tempo} minutos")
+                    print(f" Caminho: {' -> '.join(rota)}")
+            except ValueError:
+                print("\nPor favor, digite um número de ID válido.")
+            input("\nPressione ENTER para voltar...")
+            
+        elif opcao == '2':
+            limpar_tela()
+            print("--- PROJETO DE EXPANSAO (ÁRVORE GERADORA MÍNIMA) ---")
+            sucesso, resultado = planejar_infraestrutura()
+            
+            if not sucesso:
+                print(f"\n[!] {resultado}")
+            else:
+                custo, conexoes = resultado
+                print(f"\n[OK] Malha de rede calculada (Algoritmo de Prim)!")
+                print(f" Custo Total da Infraestrutura: {custo} (unidades de tempo/distância)")
+                print("\n Conexões Estratégicas Selecionadas:")
+                for c in conexoes:
+                    print(f"  + {c}")
+            input("\nPressione ENTER para voltar...")
+
 def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_table, indice_ingredientes):
     while True:
         limpar_tela()
@@ -303,6 +355,7 @@ def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_
         print(" [4] Modo Chef (Guloso)")
         print(" [5] Modo Oficina de Produção (Grafos)")
         print(" [6] Modo Finanças (PD/Backtracking)")
+        print(" [7] Modo Logistica (Dijkstra/Prim)")
         print(" [0] Sair do sistema")
         print("=" * 55)
         
@@ -329,6 +382,9 @@ def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_
 
         elif opcao == '6':
             sub_menu_financas(estante_de_receitas)
+
+        elif opcao == '7':
+            sub_menu_logistica()
             
         elif opcao == '0':
             limpar_tela()
