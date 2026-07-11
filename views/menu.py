@@ -4,7 +4,7 @@ from controllers.investigacao import *
 from controllers.recomendacao import recomendar_cardapio_guloso
 from controllers.oficina import analisar_producao
 from controllers.financas import maximizar_lucro_cardapio, gerar_menu_namorados
-from controllers.logistica import rotear_entrega, planejar_infraestrutura
+from controllers.logistica import rotear_entrega, planejar_infraestrutura, rotear_multiplas_entregas
 
 def limpar_tela():
     comando = "cls" if os.name == "nt" else "clear"
@@ -295,10 +295,11 @@ def sub_menu_logistica():
     while True:
         limpar_tela()
         print("=" * 45)
-        print(" MODO LOGÍSTICA DE ENTREGAS ")
+        print(" MODO LOGÍSTICA DE ENTREGAS (GRAFOS)")
         print("=" * 45)
-        print(" [1] Calcular Rota de Entrega (Dijkstra)")
-        print(" [2] Planejar Malha de Filiais (Prim - MST)")
+        print(" [1] Calcular Rota Única (Dijkstra - Mod. 7)")
+        print(" [2] Planejar Filiais (Prim / MST - Mod. 7)")
+        print(" [3] Rota do Entregador (Caixeiro Viajante - Mod. 8)")
         print(" [0] Voltar ao Menu Principal")
         print("=" * 45)
         
@@ -336,10 +337,37 @@ def sub_menu_logistica():
             else:
                 custo, conexoes = resultado
                 print(f"\n[OK] Malha de rede calculada (Algoritmo de Prim)!")
-                print(f" Custo Total da Infraestrutura: {custo} (unidades de tempo/distância)")
-                print("\n Conexões Estratégicas Selecionadas:")
+                print(f" Custo total da infraestrutura: {custo} min")
+                print("\n Conexões estratégicas selecionadas:")
                 for c in conexoes:
                     print(f"  + {c}")
+            input("\nPressione ENTER para voltar...")
+
+        elif opcao == '3':
+            limpar_tela()
+            print("--- ROTA DO MOTOBOY (CAIXEIRO VIAJANTE / TSP) ---")
+            print("IDs Populares: 1 (Anglo), 4 (Laranjal), 12 (Baronesa), 18 (Pestano)")
+            destinos = input("\nDigite os IDs das entregas separados por vírgula (ex: 4, 12, 18): ")
+            
+            sucesso, resultado = rotear_multiplas_entregas(destinos)
+            
+            if not sucesso:
+                print(f"\n[!] {resultado}")
+            else:
+                tempo, rota, pedidos = resultado
+                print(f"\n[OK] Heurística do Vizinho Mais Próximo aplicada!")
+                print(f" Tempo total (ida e volta): {tempo} minutos")
+                print(f"\n Rota Passo a Passo:")
+
+                caminho_formatado = ""
+                for i, ponto in enumerate(rota):
+                    if ponto in pedidos or i == 0 or i == len(rota)-1:
+                        caminho_formatado += f"[{ponto}] -> "
+                    else:
+                        caminho_formatado += f"{ponto} -> "
+                print(f" {caminho_formatado[:-4]}")
+                print("\n * Locais em [Colchetes] são as paradas de entrega e a base.")
+            
             input("\nPressione ENTER para voltar...")
 
 def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_table, indice_ingredientes):

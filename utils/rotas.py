@@ -63,3 +63,40 @@ def calcular_prim(grafo, vertice_inicial=0):
                     heapq.heappush(pq, (vizinho['peso'], v, vizinho['destino']))
 
     return custo_total, mst
+
+def calcular_tsp_vizinho_mais_proximo(grafo, origem, destinos):
+
+    rota_completa = []
+    tempo_total = 0
+    atual = origem
+    pendentes = destinos.copy()
+
+    while pendentes:
+        mais_proximo = None
+        menor_tempo = float('inf')
+        melhor_caminho = []
+
+        for destino in pendentes:
+            tempo, caminho = calcular_dijkstra(grafo, atual, destino)
+            if tempo < menor_tempo:
+                menor_tempo = tempo
+                mais_proximo = destino
+                melhor_caminho = caminho
+
+        if mais_proximo is None:
+            break
+
+        tempo_total += menor_tempo
+        
+        if rota_completa:
+            melhor_caminho = melhor_caminho[1:]
+            
+        rota_completa.extend(melhor_caminho)
+        atual = mais_proximo
+        pendentes.remove(mais_proximo)
+
+    tempo_volta, caminho_volta = calcular_dijkstra(grafo, atual, origem)
+    tempo_total += tempo_volta
+    rota_completa.extend(caminho_volta[1:])
+
+    return tempo_total, rota_completa
