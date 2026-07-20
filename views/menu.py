@@ -3,7 +3,7 @@ import os
 from controllers.investigacao import *
 from controllers.recomendacao import recomendar_cardapio_guloso
 from controllers.oficina import analisar_producao, consultar_prerequisitos
-from controllers.financas import maximizar_lucro_cardapio, gerar_menu_namorados
+from controllers.financas import maximizar_lucro_cardapio, gerar_menu_namorados, exibir_relatorio_combo_namorados
 from controllers.logistica import rotear_entrega, planejar_infraestrutura, rotear_multiplas_entregas
 from controllers.simulador_fluxo import SimuladorCapacidadeLogistica
 import random
@@ -304,24 +304,30 @@ def sub_menu_financas(estante_de_receitas):
             
         elif opcao == '2':
             limpar_tela()
-            print("--- GERADOR DE COMBOS (BACKTRACKING) ---")
+            print("--- GERADOR DE MENU DIA DOS NAMORADOS (BACKTRACKING) ---")
             try:
                 orcamento = float(input("Qual o limite de custo para fechar o Combo? R$ "))
-                sucesso, combos = gerar_menu_namorados(estante_de_receitas, orcamento)
+                tempo = int(input("Qual o tempo máximo de preparo tolerado? (minutos): "))
+
+                entradas = [r for r in estante_de_receitas if "Snack" in r.mealType or "Starter" in r.mealType]
+                principais = [r for r in estante_de_receitas if "Dinner" in r.mealType or "Lunch" in r.mealType]
+                sobremesas = [r for r in estante_de_receitas if "Dessert" in r.mealType]
+
+                if not entradas or not principais or not sobremesas:
+                    print("\n[!] Erro: Faltam receitas de uma das categorias essenciais na base de dados.")
+                    input("\nPressione ENTER para voltar...")
+                    continue
+
+                sucesso, resultado = gerar_menu_namorados(entradas, principais, sobremesas, orcamento, tempo)
                 
                 if not sucesso:
-                    print(f"\n[!] {combos}")
+                    print(f"\n[!] {resultado}")
                 else:
-                    print(f"\n[OK] {len(combos)} combinações encontradas via Poda (Pruning)!\n")
-                    for i, combo in enumerate(combos[:5]):
-                        custo = sum(p.custo for p in combo)
-                        venda = sum(p.valor_venda for p in combo)
-                        print(f"Combo {i+1} (Custo: R$ {custo:.2f} | Venda: R$ {venda:.2f})")
-                        print(f"  Entrada:   {combo[0].name}")
-                        print(f"  Principal: {combo[1].name}")
-                        print(f"  Sobremesa: {combo[2].name}\n")
+                    print("\n[OK] Árvore de Possibilidades Podada com Sucesso!")
+                    exibir_relatorio_combo_namorados(resultado)
+                    
             except ValueError:
-                print("\nPor favor, digite um valor válido.")
+                print("\nPor favor, digite valores numéricos válidos.")
             input("\nPressione ENTER para voltar...")
 
 def sub_menu_logistica(estante_de_receitas):
@@ -428,12 +434,7 @@ def sub_menu_logistica(estante_de_receitas):
                 receita_alvo = random.choice(estante_de_receitas).name
             else:
                 receita_alvo = "Menu Completo (Base Vazia)"
-
-            print("\n" + "="*50)
-            print(" RELATÓRIO DE ESTRESSE LOGÍSTICO (Ford-Fulkerson)")
-            print("="*50)
-            print(f"Cenário: Pico de pedidos de '{receita_alvo}' na Sexta-feira.")
-
+                
             print("\n" + "="*50)
             print(" RELATÓRIO DE ESTRESSE LOGÍSTICO (Ford-Fulkerson)")
             print("="*50)
