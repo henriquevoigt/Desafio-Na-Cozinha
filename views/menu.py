@@ -419,12 +419,18 @@ def sub_menu_logistica(estante_de_receitas):
                 print(f" {caminho_formatado[:-4]}")
                 print("\n * Locais em [Colchetes] são as paradas de entrega e a base.")
 
+            input("\nPressione ENTER para voltar...")
+
         elif opcao == '4':
 
             cap_cozinha = random.randint(50, 120)
             cap_frota = random.randint(40, 100)
             cap_laranjal = random.randint(20, 80)
             cap_fragata = random.randint(20, 80)
+##            cap_cozinha = 100
+##            cap_frota = 100
+##            cap_laranjal = 15
+##            cap_fragata = 10
 
             simulador = SimuladorCapacidadeLogistica(cap_cozinha, cap_frota, cap_laranjal, cap_fragata)
 
@@ -438,18 +444,25 @@ def sub_menu_logistica(estante_de_receitas):
             print("\n" + "="*50)
             print(" RELATÓRIO DE ESTRESSE LOGÍSTICO (Ford-Fulkerson)")
             print("="*50)
+            print(f"Capacidade da Cozinha: {cap_cozinha} pedidos/hora")
+            print(f"Capacidade da Frota: {cap_frota} pedidos/hora")
+            print(f"Capacidade do Laranjal: {cap_laranjal} pedidos/hora")
+            print(f"Capacidade da Fragata: {cap_fragata} pedidos/hora")
             print(f"Cenário: Pico de pedidos de '{receita_alvo}' na Sexta-feira.")
             print("-" * 50)
             print("RESPONDENDO AOS REQUISITOS DO EDITAL:")
             print(f"1. Quantos pedidos podem ser atendidos? -> MÁXIMO DE {fluxo_max} PEDIDOS/HORA.")
             print("2. Como distribuir? -> Roteamento padrão via Dijkstra (Módulo 7).")
             print("3. Qual a capacidade máxima do sistema? -> Atingida no limite do fluxo principal.")
-            print("\n4. Existe gargalo operacional? -> SIM, O CORTE MÍNIMO OCORRE EM:")
+            if gargalos:
 
-            for u, v in gargalos:
-                print(f"   !!! LIMITADOR DETECTADO entre: [{u}] e [{v}]")
-                print("   Sugestão: Aumentar capacidade neste gargalo para expandir o fluxo total.")
-            print("="*50)
+                for u, v in gargalos:
+                    print(f"   !!! LIMITADOR DETECTADO entre: [{u}] e [{v}]")
+                    print("   Sugestão: Aumentar capacidade neste gargalo para expandir o fluxo total.")
+                print("="*50)
+            else:
+                print("\n4. Existe gargalo operacional? -> NÃO")
+                print("="*50)
                
             input("\nPressione ENTER para voltar...")            
 
