@@ -1,12 +1,13 @@
 import heapq
 
-def calcular_dijkstra(grafo, origem, destino):
- 
+def calcular_dijkstra(grafo, origem, destino, bloqueios=None):
+    if bloqueios is None:
+        bloqueios = set()
+
     distancias = {v: float('inf') for v in grafo}
     distancias[origem] = 0
 
     pq = [(0, origem)]
-
     rastreio = {origem: None}
 
     while pq:
@@ -22,12 +23,18 @@ def calcular_dijkstra(grafo, origem, destino):
             v = vizinho['destino']
             peso = vizinho['peso']
             
+            if v in bloqueios:
+                continue
+            
             nova_distancia = dist_atual + peso
 
             if nova_distancia < distancias[v]:
                 distancias[v] = nova_distancia
                 rastreio[v] = u
                 heapq.heappush(pq, (nova_distancia, v))
+
+    if distancias[destino] == float('inf'):
+        return float('inf'), []
 
     caminho = []
     atual = destino

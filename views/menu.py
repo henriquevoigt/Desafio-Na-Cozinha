@@ -2,9 +2,11 @@ import subprocess
 import os
 from controllers.investigacao import *
 from controllers.recomendacao import recomendar_cardapio_guloso
-from controllers.oficina import analisar_producao
+from controllers.oficina import analisar_producao, consultar_prerequisitos
 from controllers.financas import maximizar_lucro_cardapio, gerar_menu_namorados
 from controllers.logistica import rotear_entrega, planejar_infraestrutura, rotear_multiplas_entregas
+from controllers.simulador_fluxo import SimuladorCapacidadeLogistica
+import random
 
 def limpar_tela():
     comando = "cls" if os.name == "nt" else "clear"
@@ -210,27 +212,58 @@ def sub_menu_chef(estante_de_receitas):
             input("Pressione ENTER para voltar...")
 
 def sub_menu_oficina(estante_de_receitas):
-    limpar_tela()
-    print("=" * 40)
-    print(" MODO OFICINA DE PRODUÇÃO (MÓDULO 5)")
-    print("=" * 40)
-    print(" Analisando dependências de preparo com Grafos...\n")
-    
-    deu_certo, resultado = analisar_producao(estante_de_receitas)
-    
-    if not deu_certo:
-        print(" [!] ALERTA DO SISTEMA [!]")
-        print(f" {resultado}")
-    else:
-        print(" [OK] Análise concluída. Nenhum ciclo encontrado.")
-        print(" Ordem de preparo topológica otimizada:\n")
-        # imprime as 10 primeiras
-        for i, prato in enumerate(resultado[:10]):
-            print(f"   {i+1}. {prato}")
-        if len(resultado) > 10:
-            print(f"   ... e mais {len(resultado) - 10} pratos prontos para a linha.")
+    while True:
+        limpar_tela()
+        print("=" * 45)
+        print(" MODO OFICINA DE PRODUÇÃO (MÓDULO 5)")
+        print("=" * 45)
+        print(" [1] Gerar Ordem de Produção / Checar Erros")
+        print(" [2] Consultar Pré-requisitos de uma Receita")
+        print(" [0] Voltar")
+        print("=" * 45)
+        
+        opcao = input("\nEscolha uma consulta: ")
+        
+        if opcao == '0':
+            break
             
-    input("\nPressione ENTER para voltar ao menu...")
+        elif opcao == '1':
+            limpar_tela()
+            print("--- ANÁLISE DE FLUXO GERAL ---")
+            deu_certo, resultado = analisar_producao(estante_de_receitas)
+            
+            if not deu_certo:
+                print(f" [!] ALERTA DO SISTEMA [!]\n {resultado}")
+            else:
+                print(" [OK] Análise concluída. Nenhum ciclo encontrado.")
+                print(" Ordem de preparo topológica otimizada:\n")
+                for i, prato in enumerate(resultado[:10]):
+                    print(f"   {i+1}. {prato}")
+                if len(resultado) > 10:
+                    print(f"   ... e mais {len(resultado) - 10} pratos prontos para a linha.")
+            input("\nPressione ENTER para voltar...")
+            
+        elif opcao == '2':
+            limpar_tela()
+            print("--- RASTREIO DE PRÉ-REQUISITOS ---")
+            try:
+                id_busca = int(input("Digite o ID da receita para investigar: "))
+                sucesso, dados = consultar_prerequisitos(estante_de_receitas, id_busca)
+                
+                if not sucesso:
+                    print(f"\n[!] {dados}")
+                else:
+                    nome_prato, dependencias = dados
+                    print(f"\n Receita Alvo: {nome_prato}")
+                    if not dependencias:
+                        print(" Status: ESTA RECEITA É INDEPENDENTE. Pode ir direto para o fogão!")
+                    else:
+                        print(f" Para preparar este prato, você DEVE concluir antes:")
+                        for i, dep in enumerate(dependencias, 1):
+                            print(f"   {i}. {dep}")
+            except ValueError:
+                print("\nPor favor, digite um número inteiro válido.")
+            input("\nPressione ENTER para voltar...")
 
 def sub_menu_financas(estante_de_receitas):
     while True:
@@ -291,15 +324,16 @@ def sub_menu_financas(estante_de_receitas):
                 print("\nPor favor, digite um valor válido.")
             input("\nPressione ENTER para voltar...")
 
-def sub_menu_logistica():
+def sub_menu_logistica(estante_de_receitas):
     while True:
         limpar_tela()
         print("=" * 45)
         print(" MODO LOGÍSTICA DE ENTREGAS (GRAFOS)")
         print("=" * 45)
         print(" [1] Calcular Rota Única (Dijkstra - Mod. 7)")
-        print(" [2] Planejar Filiais (Prim / MST - Mod. 7)")
+        print(" [2] Malha de pontos operacionais (Prim / MST - Mod. 7)")
         print(" [3] Rota do Entregador (Caixeiro Viajante - Mod. 8)")
+        print(" [4] Avaliar Gargalo Operacional (Ford-Fulkerson - Mod. 7)")
         print(" [0] Voltar ao Menu Principal")
         print("=" * 45)
         
@@ -314,13 +348,24 @@ def sub_menu_logistica():
             print("ID 1 = UFPel Anglo | ID 4 = Laranjal | ID 14 = Balsa | ID 24 = Rodoviária")
             try:
                 destino = int(input("\nDigite o ID do bairro de destino: "))
-                sucesso, resultado = rotear_entrega(destino)
+                
+                print("\n[Opcional] Há algum bairro ou região interditada hoje?")
+                bloqueios = input("Digite os IDs dos bairros bloqueados separados por vírgula (ou aperte ENTER para pular): ")
+                
+                sucesso, resultado = rotear_entrega(destino, bloqueios)
                 
                 if not sucesso:
                     print(f"\n[!] {resultado}")
                 else:
-                    tempo, rota = resultado
+                    tempo, rota, houve_desvio = resultado
+                    
                     print(f"\n[OK] Rota calculada com sucesso!")
+
+                    if houve_desvio:
+                        print(" [!] ATENÇÃO: O trajeto original estava bloqueado. Rota alternativa traçada!")
+                    elif bloqueios.strip():
+                        print(" [i] NOTA: Os bloqueios informados não afetaram a rota ideal.")
+                        
                     print(f" Tempo estimado: {tempo} minutos")
                     print(f" Caminho: {' -> '.join(rota)}")
             except ValueError:
@@ -367,8 +412,45 @@ def sub_menu_logistica():
                         caminho_formatado += f"{ponto} -> "
                 print(f" {caminho_formatado[:-4]}")
                 print("\n * Locais em [Colchetes] são as paradas de entrega e a base.")
-            
-            input("\nPressione ENTER para voltar...")
+
+        elif opcao == '4':
+
+            cap_cozinha = random.randint(50, 120)
+            cap_frota = random.randint(40, 100)
+            cap_laranjal = random.randint(20, 80)
+            cap_fragata = random.randint(20, 80)
+
+            simulador = SimuladorCapacidadeLogistica(cap_cozinha, cap_frota, cap_laranjal, cap_fragata)
+
+            fluxo_max, gargalos = simulador.calcular_fluxo_maximo_e_gargalo()
+
+            if estante_de_receitas:
+                receita_alvo = random.choice(estante_de_receitas).name
+            else:
+                receita_alvo = "Menu Completo (Base Vazia)"
+
+            print("\n" + "="*50)
+            print(" RELATÓRIO DE ESTRESSE LOGÍSTICO (Ford-Fulkerson)")
+            print("="*50)
+            print(f"Cenário: Pico de pedidos de '{receita_alvo}' na Sexta-feira.")
+
+            print("\n" + "="*50)
+            print(" RELATÓRIO DE ESTRESSE LOGÍSTICO (Ford-Fulkerson)")
+            print("="*50)
+            print(f"Cenário: Pico de pedidos de '{receita_alvo}' na Sexta-feira.")
+            print("-" * 50)
+            print("RESPONDENDO AOS REQUISITOS DO EDITAL:")
+            print(f"1. Quantos pedidos podem ser atendidos? -> MÁXIMO DE {fluxo_max} PEDIDOS/HORA.")
+            print("2. Como distribuir? -> Roteamento padrão via Dijkstra (Módulo 7).")
+            print("3. Qual a capacidade máxima do sistema? -> Atingida no limite do fluxo principal.")
+            print("\n4. Existe gargalo operacional? -> SIM, O CORTE MÍNIMO OCORRE EM:")
+
+            for u, v in gargalos:
+                print(f"   !!! LIMITADOR DETECTADO entre: [{u}] e [{v}]")
+                print("   Sugestão: Aumentar capacidade neste gargalo para expandir o fluxo total.")
+            print("="*50)
+               
+            input("\nPressione ENTER para voltar...")            
 
 def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_table, indice_ingredientes):
     while True:
@@ -412,7 +494,7 @@ def rodar_menu(trie_nomes, trie_ids, trie_categorias, estante_de_receitas, hash_
             sub_menu_financas(estante_de_receitas)
 
         elif opcao == '7':
-            sub_menu_logistica()
+            sub_menu_logistica(estante_de_receitas)
             
         elif opcao == '0':
             limpar_tela()

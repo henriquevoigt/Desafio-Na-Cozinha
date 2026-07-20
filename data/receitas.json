@@ -86,7 +86,7 @@
       "rating": 4.9,
       "reviewCount": 82,
       "mealType": ["Lunch", "Dinner"],
-      "dependencias": [5],
+      "dependencias": [],
       "custo": 35.5,
       "valor_venda": 88.75,
       "classe": "Prato Principal",

@@ -1,8 +1,5 @@
 def ordenacao_topologica_kahn(grafo, graus_entrada):
-    """
-    grafo: dict { id_no: [ids_vizinhos] }
-    graus_entrada: dict { id_no: int }
-    """
+
     fila = [no for no in graus_entrada if graus_entrada[no] == 0]
     ordem_topologica = []
 
@@ -17,4 +14,7 @@ def ordenacao_topologica_kahn(grafo, graus_entrada):
 
     tem_ciclo = len(ordem_topologica) != len(graus_entrada)
     
-    return ordem_topologica, tem_ciclo
+    # se tem ciclo, quem sobrou com grau > 0 é o culpado/travado.
+    nos_travados = [no for no, grau in graus_entrada.items() if grau > 0] if tem_ciclo else []
+
+    return ordem_topologica, tem_ciclo, nos_travados

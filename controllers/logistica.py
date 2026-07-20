@@ -2,7 +2,6 @@ import json
 import os
 from utils.rotas import calcular_dijkstra, calcular_prim, calcular_tsp_vizinho_mais_proximo
 
-
 def carregar_mapa():
 
     caminho = "data/mapa.json"
@@ -27,8 +26,7 @@ def carregar_mapa():
     return grafo, nomes_bairros
 
 
-def rotear_entrega(id_destino):
-    """ Chama o Dijkstra partindo do Restaurante Jacquin (ID 0) """
+def rotear_entrega(id_destino, string_bloqueios=""):
     grafo, nomes = carregar_mapa()
     if not grafo:
         return False, "Erro: mapa.json não encontrado."
@@ -36,11 +34,40 @@ def rotear_entrega(id_destino):
     if id_destino not in grafo:
         return False, "Bairro de destino não existe no mapa."
 
-    tempo, caminho_ids = calcular_dijkstra(grafo, 0, id_destino)
+    bloqueios = set()
+    if string_bloqueios.strip():
+        try:
+            bloqueios = {int(x.strip()) for x in string_bloqueios.split(',')}
+        except ValueError:
+            return False, "Formato de bloqueio inválido. Use números separados por vírgula."
+        
+        for b in bloqueios:
+            if b not in grafo:
+                return False, f"O bairro bloqueado ID {b} não existe no mapa."
+            if b == 0:
+                return False, "Você não pode bloquear o Restaurante (Base)!"
+            if b == id_destino:
+                return False, "Você não pode bloquear o destino final da entrega!"
 
-    rota_nomes = [nomes[id_bairro] for id_bairro in caminho_ids]
+    # calcula a rota ideal
+    tempo_ideal, caminho_ideal = calcular_dijkstra(grafo, 0, id_destino)
+
+    if not bloqueios:
+        rota_nomes = [nomes[id_bairro] for id_bairro in caminho_ideal]
+        return True, (tempo_ideal, rota_nomes, False)
+
+    # calcula a rota real
+    tempo_real, caminho_real = calcular_dijkstra(grafo, 0, id_destino, bloqueios)
+
+    if tempo_real == float('inf'):
+        return False, f"ROTA IMPOSSÍVEL! Os bloqueios isolaram completamente o caminho para {nomes[id_destino]}."
+
+    # compara as rotas para descobrir se houve desvio
+    houve_desvio = (caminho_ideal != caminho_real)
     
-    return True, (tempo, rota_nomes)
+    rota_nomes = [nomes[id_bairro] for id_bairro in caminho_real]
+    
+    return True, (tempo_real, rota_nomes, houve_desvio)
 
 
 def planejar_infraestrutura():

@@ -73,6 +73,11 @@ O projeto implementa do zero **todas as 4 estruturas base sugeridas no T1**, al�
 * **Onde foi aplicada:** Na geração automática de combinações perfeitas e viáveis (Entrada, Principal, Sobremesa) limitadas por um orçamento máximo imposto pelo Chef.
 * **Justificativa Técnica:** A árvore de possibilidades por força bruta cresceria exponencialmente. A implementação via Backtracking utiliza técnica de **Poda (Pruning)**: caso a soma parcial do custo da entrada e do prato principal já ultrapasse o orçamento na árvore de recursão, a ramificação inteira das sobremesas é sumariamente ignorada. As combinações finais válidas são salvas e ranqueadas por maior potencial de valor de venda ao restaurante.
 
+
+### 10. Fluxo em Redes e Corte Mínimo (Módulo 7 - Simulação de Gargalo Operacional)
+* **Onde foi aplicada:** No simulador de estresse logístico, avaliando a capacidade máxima de atendimento do restaurante em dias de pico.
+* **Justificativa Técnica:** A operação foi modelada como um Grafo de Fluxo Direcionado e em camadas (Demanda -> Cozinha -> Frota -> Bairros). Implementou-se o algoritmo de **Ford-Fulkerson**, otimizado com a estratégia de **Edmonds-Karp** (que utiliza Busca em Largura - BFS para encontrar caminhos de aumento, garantindo convergência). Além de calcular o Fluxo Máximo (capacidade total de pedidos/hora), o sistema aplica o teorema do **Fluxo Máximo / Corte Mínimo (Min-Cut)**. Isso permite que o código identifique e aponte matematicamente qual é a aresta exata que está estrangulando a operação (ex: falta de motoboys vs. cozinha pequena), gerando inteligência de negócio prática.
+
 ---
 
 ## Arquitetura do Projeto
